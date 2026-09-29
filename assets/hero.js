@@ -12,7 +12,8 @@
   let off = 0;
   const take = (T) => { const n = N * T.BYTES_PER_ELEMENT; const x = new T(raw.buffer.slice(off, off + n)); off += n; return x; };
   const qA = take(Uint16Array), qE = take(Uint16Array), qI = take(Uint8Array), qO = take(Uint8Array), qW = take(Uint8Array), qM = take(Uint16Array);
-  take(Uint8Array); const qC = take(Uint8Array);
+  take(Uint8Array); const qC = take(Uint8Array); const qD = take(Uint16Array);
+  const disc = new Float32Array(N); for (let k = 0; k < N; k++) disc[k] = 60615 + qD[k]; // MJD of discovery observation
 
   const K = 0.01720209895, EPOCH = 61200;
   const a = new Float32Array(N), e = new Float32Array(N), n = new Float64Array(N), M0 = new Float64Array(N);
@@ -41,7 +42,10 @@
     cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
   }
 
-  let t = 61312, az = 0.6; // 2026-09-29
+  const T_START = 60766, T_END = 61771; // 2025-04-01 → 2028-01-01, then loop
+  // reduced motion: one still frame after the last discovery, so every object is shown
+  let t = reduce ? 61312 : T_START, az = 0.6;
+  const FLASH = 24; // days a new discovery stays lit
   const tilt = 1.02;        // ~58 degrees: a raked, three-quarter view of the belt
   function draw() {
     const wide = W > 760;
@@ -64,6 +68,7 @@
     }
     ctx.globalCompositeOperation = 'lighter';
     for (let k = 0; k < N; k++) {
+      if (disc[k] > t) { scr[k*2] = -99; continue; } // not discovered yet
       const E = kepler(M0[k] + n[k] * (t - EPOCH), e[k]), o = k * 3;
       const x = a[k] * (Math.cos(E) - e[k]), y = a[k] * Math.sqrt(1 - e[k] * e[k]) * Math.sin(E);
       const X = x * P[o] + y * Q[o], Y = x * P[o+1] + y * Q[o+1], Z = x * P[o+2] + y * Q[o+2];
@@ -80,6 +85,15 @@
         ctx.fillRect(x - h, y - h, z, z);
       }
     }
+    // discovery flashes: a white burst that shrinks into the object's normal dot
+    ctx.fillStyle = '#ffffff';
+    for (let k = 0; k < N; k++) {
+      const age = t - disc[k];
+      if (age < 0 || age > FLASH) continue;
+      const f = 1 - age / FLASH, z = 1.5 + 3.5 * f * f;
+      ctx.globalAlpha = 0.5 * f;
+      ctx.fillRect(scr[k*2] - z / 2, scr[k*2+1] - z / 2, z, z);
+    }
     ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
     // planets + Sun
     ctx.fillStyle = 'rgba(225,230,240,.85)';
@@ -93,17 +107,27 @@
     ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, 16, 0, 7); ctx.fill();
   }
 
+  const dateEl = document.getElementById('heroDate');
+  let shownDate = '';
+  function stamp() {
+    const d = new Date((t - 40587) * 86400000).toISOString().slice(0, 10); // MJD -> ISO date
+    if (d !== shownDate && dateEl) { dateEl.textContent = d; shownDate = d; }
+  }
+
   let visible = true, raf = 0, last = performance.now();
   function loop(now) {
     raf = 0;
     const dt = Math.min(0.1, (now - last) / 1000); last = now;
     t += dt * 20; az += dt * 0.012;
-    draw();
+    // fade out over the last ~1.5 s of the loop, jump back, fade in
+    if (t > T_END - 30 && !cv.classList.contains('looping')) cv.classList.add('looping');
+    if (t >= T_END) { t = T_START; cv.classList.remove('looping'); }
+    draw(); stamp();
     if (visible && !document.hidden) raf = requestAnimationFrame(loop);
   }
   const start = () => { if (!raf && !reduce) { last = performance.now(); raf = requestAnimationFrame(loop); } };
   new IntersectionObserver((es) => { visible = es[0].isIntersecting; if (visible) start(); }).observe(cv);
   document.addEventListener('visibilitychange', start);
   new ResizeObserver(() => { resize(); draw(); }).observe(cv);
-  resize(); draw(); cv.classList.add('ready'); start();
+  resize(); draw(); stamp(); cv.classList.add('ready'); start();
 })();

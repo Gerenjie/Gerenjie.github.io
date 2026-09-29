@@ -53,6 +53,7 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .hero { position: relative; min-height: min(88vh, 820px); display: grid; align-items: end; overflow: hidden; margin-top: -61px; }
 #hero-sky { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 1.6s ease; }
 #hero-sky.ready { opacity: 1; }
+#hero-sky.ready.looping { opacity: 0; transition-duration: 1.4s; }
 .hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(6,8,13,.92) 0%, rgba(6,8,13,.55) 38%, rgba(6,8,13,0) 62%), linear-gradient(0deg, var(--bg) 0%, rgba(6,8,13,0) 30%); pointer-events: none; }
 .hero-copy { position: relative; z-index: 1; padding: 140px var(--gutter) clamp(40px, 7vw, 80px); max-width: 1180px; width: 100%; margin: 0 auto; display: grid; gap: 18px; }
 .eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
@@ -63,6 +64,7 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .caption { font-family: var(--mono); font-size: 11.5px; color: var(--faint); letter-spacing: .03em; display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; }
 .caption .k { display: inline-flex; align-items: center; gap: 6px; }
 .caption .k i { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+.caption .date { color: var(--fg); font-variant-numeric: tabular-nums; padding-right: 14px; border-right: 1px solid var(--line); }
 .caption a { color: var(--muted); border-bottom: 1px solid var(--line); }
 .caption a:hover { color: var(--fg); text-decoration: none; border-color: var(--muted); }
 @media (max-width: 760px) { .hero::after { background: linear-gradient(0deg, var(--bg) 0%, rgba(6,8,13,.86) 45%, rgba(6,8,13,.1) 80%); } .hero { min-height: 92vh; } }
@@ -135,14 +137,8 @@ figcaption { font-family: var(--mono); font-size: 11.5px; color: var(--faint); }
 .filter button[aria-pressed="true"] { color: var(--bg); background: var(--fg); border-color: var(--fg); }
 @media (max-width: 640px) { .pubs li { grid-template-columns: 44px minmax(0, 1fr); } .pubs .j { grid-column: 2; white-space: normal; } }
 
-/* talks */
-.talks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 36px; }
-.talks h3, .give h3 { font-family: var(--mono); font-weight: 500; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
-.tl { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
-.tl li { display: grid; gap: 2px; padding-left: 16px; border-left: 1px solid var(--line); }
-.tl .t { color: var(--fg); font-size: 15px; }
-.tl .w { font-family: var(--mono); font-size: 12px; color: var(--faint); }
-@media (max-width: 760px) { .talks { grid-template-columns: minmax(0, 1fr); } }
+/* shared small heading */
+.give h3 { font-family: var(--mono); font-weight: 500; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
 
 /* mentoring & outreach */
 .give { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--line); }
@@ -184,7 +180,6 @@ footer { max-width: 1180px; margin: 0 auto; padding: 22px var(--gutter) calc(env
   <ul>
     <li><a href="#research">Research</a></li>
     <li><a href="#papers">Papers</a></li>
-    <li class="opt"><a href="#talks">Talks</a></li>
     <li class="opt"><a href="#outreach">Outreach</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
@@ -194,10 +189,11 @@ footer { max-width: 1180px; margin: 0 auto; padding: 22px var(--gutter) calc(env
   <header class="hero">
     <canvas id="hero-sky" aria-label="Animated view of the inner solar system showing every asteroid Rubin Observatory has discovered"></canvas>
     <div class="hero-copy">
-      <div class="eyebrow">Astronomy PhD candidate · University of Washington · Rubin Observatory</div>
+      <div class="eyebrow">PhD candidate · University of Washington · Rubin Observatory</div>
       <h1>Jake<br><em>Kurlander</em></h1>
-      <p class="lede">I build the software that finds asteroids in Rubin Observatory's Legacy Survey of Space and Time. <b>Every point behind this text is a minor planet Rubin has discovered</b>, shown where it is in its orbit right now.</p>
+      <p class="lede">I build the software that finds asteroids in Rubin Observatory's Legacy Survey of Space and Time.</p>
       <div class="caption">
+        <span class="date" id="heroDate" title="Date shown in the animation">2025-04-01</span>
         <span class="k"><i style="background:var(--mb)"></i>main belt</span>
         <span class="k"><i style="background:var(--neo)"></i>near-Earth &amp; Mars-crossing</span>
         <span class="k"><i style="background:var(--res)"></i>Hildas &amp; Trojans</span>
@@ -211,8 +207,8 @@ footer { max-width: 1180px; margin: 0 auto; padding: 22px var(--gutter) calc(env
     <div class="about">
       <div>
         <div class="prose">
-          <p>I'm a PhD candidate in Astronomy at the University of Washington and the DiRAC Institute, advised by Mario Jurić. Since 2023 I have been a <strong>solar system pipeline developer for the Vera C. Rubin Observatory</strong>: I designed the pipeline that associates detections with known objects, and integrated the heliolinx linking algorithm into a new LSST discovery pipeline. The pipeline runs I'm responsible for have found more than 33,000 new asteroids.</p>
-          <p>My thesis, <em>Debiasing the LSST Solar System Catalogs</em>, asks the question that comes after discovery: given what the survey detected, what is actually out there? That means characterizing exactly which objects the survey could have found, and correcting for the ones it missed.</p>
+          <p>I'm a PhD candidate in Astronomy at the University of Washington and the DiRAC Institute, advised by Mario Jurić. Since 2023 I have developed the <strong>Vera C. Rubin Observatory's solar system pipelines</strong>: I designed the pipeline that associates detections with known objects, and integrated the heliolinx linking algorithm into a new LSST discovery pipeline. The pipeline runs I'm responsible for have found more than 33,000 new asteroids.</p>
+          <p>My thesis, <em>Debiasing the LSST Solar System Catalogs</em>, aims to extend LSST's discoveries into a robust statistical constraint on the solar system by accounting not only for what we see, but what we should expect remains unseen.</p>
           <p>Before Rubin I worked at the Minor Planet Center at the Smithsonian Astrophysical Observatory, characterizing all-sky surveys and searching archival catalogs for distant objects. I studied math and computer science at Harvard.</p>
         </div>
         <dl class="facts">
@@ -256,7 +252,6 @@ footer { max-width: 1180px; margin: 0 auto; padding: 22px var(--gutter) calc(env
         <div class="body">
           <h3>Debiasing the LSST solar system catalogs</h3>
           <p>A discovery list tells you what a survey caught, not what exists. I inject simulated asteroids into Rubin's image processing to measure, object by object, whether a source of a given brightness and motion would have been detected, and use that to recover the true populations behind the catalogs.</p>
-          <div class="links"><a href="#talks">Early characterization of Rubin's discovery efficiency (ACM 2026)</a></div>
         </div>
       </article>
       <article class="project">
@@ -280,7 +275,7 @@ footer { max-width: 1180px; margin: 0 auto; padding: 22px var(--gutter) calc(env
 
   <figure class="band">
     <img src="assets/dome-stairs.jpg" alt="A small figure on the steel stairway at the base of the Rubin Observatory dome" width="1800" height="1012" loading="lazy">
-    <figcaption>For scale: the Rubin dome, and me on its stairs.</figcaption>
+    <figcaption>Rubin (Jake for scale)</figcaption>
   </figure>
 
   <section class="block" id="papers" aria-labelledby="papers-h">
@@ -311,31 +306,6 @@ footer { max-width: 1180px; margin: 0 auto; padding: 22px var(--gutter) calc(env
     <p style="margin-top:14px;font-size:14px;color:var(--muted)">Full list on <a href="https://ui.adsabs.harvard.edu/search/q=author%3A%22Kurlander%2C%20J%22&amp;sort=date%20desc">NASA ADS</a> and <a href="https://orcid.org/0009-0005-5452-0671">ORCID</a>.</p>
   </section>
 
-  <section class="block" id="talks" aria-labelledby="talks-h">
-    <div class="sec-head"><div class="eyebrow">Talks</div><h2 id="talks-h">Talks</h2></div>
-    <div class="talks">
-      <div>
-        <h3>Invited</h3>
-        <ul class="tl">
-          <li><span class="t">DP2 Solar System Processing and Results</span><span class="w">Rubin Community Workshop · 2026</span></li>
-          <li><span class="t">Debiasing the Solar System with LSST</span><span class="w">Duke University · 2025</span></li>
-          <li><span class="t">Study of Solar System Objects in DP0.3</span><span class="w">DP0 Rubin Data Academy · 2025</span></li>
-          <li><span class="t">A Well-characterized Survey for Centaurs in Pan-STARRS1</span><span class="w">University of Sydney · 2024</span></li>
-          <li><span class="t">DP0.3 Simulation Overview <span style="color:var(--muted)">(with P. Bernardinelli)</span></span><span class="w">Rubin Observatory DP0.3 Delegate Assembly · 2023</span></li>
-        </ul>
-      </div>
-      <div>
-        <h3>Conferences</h3>
-        <ul class="tl">
-          <li><span class="t">Early Characterization of Rubin Observatory's Asteroid Discovery Efficiency</span><span class="w">ACM 2026 · Poznań, Poland</span></li>
-          <li><span class="t">Predictions of the LSST Solar System Yield</span><span class="w">EPSC–DPS 2025 · Helsinki, Finland</span></li>
-          <li><span class="t">A Well-Characterized HelioLinC Survey for Centaurs in Pan-STARRS1</span><span class="w">AAS 245 · National Harbor, MD · 2025</span></li>
-          <li><span class="t">Predictions of the LSST's Solar System Object Yield</span><span class="w">DPS 2024 · Boise, ID</span></li>
-          <li><span class="t">Predictions of the LSST TNO Yield</span><span class="w">TNO 2024 · Taipei, Taiwan</span></li>
-        </ul>
-      </div>
-    </div>
-  </section>
 
   <section class="block" id="outreach" aria-labelledby="outreach-h">
     <div class="sec-head"><div class="eyebrow">Mentoring &amp; outreach</div><h2 id="outreach-h">Beyond the pipeline</h2></div>
