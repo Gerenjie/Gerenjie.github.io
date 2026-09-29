@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jake Kurlander</title>
+<meta name="description" content="Jake Kurlander: PhD candidate in astronomy at the University of Washington and solar system pipeline developer for the Vera C. Rubin Observatory.">
+<meta property="og:title" content="Jake Kurlander">
+<meta property="og:description" content="Finding and debiasing the solar system with the Vera C. Rubin Observatory.">
+<meta property="og:image" content="https://gerenjie.github.io/assets/rubin-night.jpg">
+<meta name="theme-color" content="#06080d">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: night-sky site that continues the orrery. Full-bleed live hero, then a single 1100px column of
+   editorial sections, each introduced by a mono eyebrow; photographs break the column at full width. */
+:root {
+  color-scheme: dark;
+  --bg: #06080d;
+  --bg-2: #0b0f17;
+  --line: #1b2230;
+  --fg: #e7e9ee;
+  --muted: #9ba3b4;
+  --faint: #5f687b;
+  --accent: #f0a877;   /* sunset on the dome */
+  --teal: #4cb8a8;     /* the dome's stair steel */
+  --neo: #d95926; --mb: #8c95a8; --res: #199e70; --out: #3987e5;
+  --display: "Newsreader", "Iowan Old Style", Georgia, serif;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --gutter: clamp(16px, 4vw, 40px);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--sans); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+img { max-width: 100%; display: block; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+
+/* nav */
+.nav { position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: calc(env(safe-area-inset-top, 0px) + 12px) var(--gutter) 12px; background: rgba(6,8,13,.72); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid transparent; transition: border-color .2s; }
+.nav.scrolled { border-bottom-color: var(--line); }
+.nav .mark { font-family: var(--display); font-style: italic; font-size: 20px; color: var(--fg); }
+.nav ul { list-style: none; display: flex; gap: clamp(12px, 2.4vw, 28px); margin: 0; padding: 0; flex-wrap: wrap; justify-content: flex-end; }
+.nav ul a { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.nav ul a:hover { color: var(--fg); text-decoration: none; }
+@media (max-width: 640px) { .nav ul li.opt { display: none; } }
+
+/* hero */
+.hero { position: relative; min-height: min(88vh, 820px); display: grid; align-items: end; overflow: hidden; margin-top: -61px; }
+#hero-sky { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 1.6s ease; }
+#hero-sky.ready { opacity: 1; }
+.hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(6,8,13,.92) 0%, rgba(6,8,13,.55) 38%, rgba(6,8,13,0) 62%), linear-gradient(0deg, var(--bg) 0%, rgba(6,8,13,0) 30%); pointer-events: none; }
+.hero-copy { position: relative; z-index: 1; padding: 140px var(--gutter) clamp(40px, 7vw, 80px); max-width: 1180px; width: 100%; margin: 0 auto; display: grid; gap: 18px; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.hero h1 { font-family: var(--display); font-weight: 400; font-size: clamp(52px, 9vw, 112px); line-height: .95; letter-spacing: -.02em; margin: 0; }
+.hero h1 em { font-style: italic; color: var(--accent); }
+.hero .lede { font-size: clamp(17px, 1.9vw, 20px); color: var(--muted); max-width: 34em; margin: 0; }
+.hero .lede b { color: var(--fg); font-weight: 500; }
+.caption { font-family: var(--mono); font-size: 11.5px; color: var(--faint); letter-spacing: .03em; display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; }
+.caption .k { display: inline-flex; align-items: center; gap: 6px; }
+.caption .k i { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+.caption a { color: var(--muted); border-bottom: 1px solid var(--line); }
+.caption a:hover { color: var(--fg); text-decoration: none; border-color: var(--muted); }
+@media (max-width: 760px) { .hero::after { background: linear-gradient(0deg, var(--bg) 0%, rgba(6,8,13,.86) 45%, rgba(6,8,13,.1) 80%); } .hero { min-height: 92vh; } }
+
+/* sections */
+main { display: grid; }
+section.block { max-width: 1180px; width: 100%; margin: 0 auto; padding: clamp(56px, 9vw, 110px) var(--gutter) 0; }
+.sec-head { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 24px; align-items: baseline; margin-bottom: 36px; }
+.sec-head h2 { font-family: var(--display); font-weight: 400; font-size: clamp(32px, 4.4vw, 48px); line-height: 1.05; margin: 0; text-wrap: balance; letter-spacing: -.01em; }
+.sec-head .eyebrow { padding-top: .6em; }
+@media (max-width: 760px) { .sec-head { grid-template-columns: minmax(0, 1fr); gap: 8px; } .sec-head .eyebrow { padding-top: 0; } }
+.cols { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 24px; }
+.cols > .side { color: var(--faint); font-family: var(--mono); font-size: 12px; }
+@media (max-width: 760px) { .cols { grid-template-columns: minmax(0, 1fr); } .cols > .side:empty { display: none; } }
+p { margin: 0; }
+.prose { display: grid; gap: 1em; max-width: 64ch; color: #c9cdd6; font-size: 17px; }
+.prose strong { color: var(--fg); font-weight: 500; }
+
+/* about */
+.about { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: clamp(28px, 5vw, 64px); align-items: start; }
+.about figure { margin: 0; display: grid; gap: 10px; }
+.about figure img { height: auto; border-radius: 4px; aspect-ratio: 3 / 4; object-fit: cover; object-position: 50% 30%; width: 100%; }
+figcaption { font-family: var(--mono); font-size: 11.5px; color: var(--faint); }
+.facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 20px; margin-top: 28px; font-size: 14.5px; max-width: 64ch; }
+.facts dt { font-family: var(--mono); font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); padding-top: .2em; }
+.facts dd { margin: 0; color: var(--fg); }
+.facts dd span { color: var(--muted); }
+@media (max-width: 860px) { .about { grid-template-columns: minmax(0, 1fr); } .about figure { max-width: 380px; } }
+
+/* stat band */
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-top: 48px; }
+.stat { padding: 22px 20px 20px 0; display: grid; gap: 4px; }
+.stat + .stat { padding-left: 20px; border-left: 1px solid var(--line); }
+.stat b { font-family: var(--display); font-weight: 400; font-size: clamp(34px, 4vw, 46px); line-height: 1; font-variant-numeric: tabular-nums lining-nums; }
+.stat span { font-size: 13px; color: var(--muted); }
+@media (max-width: 760px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } .stat:nth-child(3) { border-left: 0; padding-left: 0; } .stat:nth-child(n+3) { border-top: 1px solid var(--line); } }
+
+/* research */
+.projects { display: grid; gap: 0; border-top: 1px solid var(--line); }
+.project { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 24px; padding: 30px 0; border-bottom: 1px solid var(--line); }
+.project .when { font-family: var(--mono); font-size: 12px; color: var(--faint); display: grid; gap: 4px; align-content: start; }
+.project .when .role { color: var(--teal); letter-spacing: .06em; text-transform: uppercase; font-size: 11px; }
+.project h3 { font-family: var(--display); font-weight: 500; font-size: clamp(22px, 2.4vw, 28px); line-height: 1.15; margin: 0 0 10px; text-wrap: balance; }
+.project .body { display: grid; gap: 12px; max-width: 66ch; color: #c9cdd6; }
+.project .links { display: flex; flex-wrap: wrap; gap: 8px 18px; font-family: var(--mono); font-size: 12.5px; }
+.project.feature { grid-template-columns: 220px minmax(0, 1fr); }
+.feature-panel { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 28px; align-items: start; }
+.orrery-card { display: block; position: relative; border: 1px solid var(--line); border-radius: 4px; overflow: hidden; background: var(--bg-2); aspect-ratio: 1 / 1; }
+.orrery-card canvas { width: 100%; height: 100%; display: block; }
+.orrery-card span { position: absolute; left: 12px; bottom: 10px; font-family: var(--mono); font-size: 11.5px; color: var(--fg); }
+.orrery-card:hover { border-color: var(--faint); text-decoration: none; }
+@media (max-width: 760px) { .project { grid-template-columns: minmax(0, 1fr); gap: 10px; } .feature-panel { grid-template-columns: minmax(0, 1fr); } .orrery-card { max-width: 320px; } }
+
+/* photo band */
+.band { margin-top: clamp(56px, 9vw, 110px); position: relative; }
+.band img { width: 100%; height: clamp(320px, 52vw, 640px); object-fit: cover; object-position: 50% 60%; }
+.band figcaption { max-width: 1180px; margin: 10px auto 0; padding-inline: var(--gutter); }
+
+/* publications */
+.pubs { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; border-top: 1px solid var(--line); }
+.pubs li { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 18px; padding: 14px 0; border-bottom: 1px solid var(--line); align-items: baseline; }
+.pubs .yr { font-family: var(--mono); font-size: 12.5px; color: var(--faint); font-variant-numeric: tabular-nums; }
+.pubs .t { font-size: 15.5px; color: var(--fg); }
+.pubs .a { font-size: 13.5px; color: var(--muted); }
+.pubs .a b { color: var(--accent); font-weight: 500; }
+.pubs .j { font-family: var(--mono); font-size: 12px; white-space: nowrap; }
+.pubs li.first .t { font-family: var(--display); font-size: 19px; line-height: 1.3; }
+.filter { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+.filter button { font-family: var(--mono); font-size: 12px; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; cursor: pointer; }
+.filter button[aria-pressed="true"] { color: var(--bg); background: var(--fg); border-color: var(--fg); }
+@media (max-width: 640px) { .pubs li { grid-template-columns: 44px minmax(0, 1fr); } .pubs .j { grid-column: 2; white-space: normal; } }
+
+/* talks */
+.talks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 36px; }
+.talks h3, .give h3 { font-family: var(--mono); font-weight: 500; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+.tl { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.tl li { display: grid; gap: 2px; padding-left: 16px; border-left: 1px solid var(--line); }
+.tl .t { color: var(--fg); font-size: 15px; }
+.tl .w { font-family: var(--mono); font-size: 12px; color: var(--faint); }
+@media (max-width: 760px) { .talks { grid-template-columns: minmax(0, 1fr); } }
+
+/* mentoring & outreach */
+.give { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--line); }
+.give > div { padding: 24px 24px 24px 0; display: grid; gap: 10px; align-content: start; }
+.give > div + div { padding-left: 24px; border-left: 1px solid var(--line); }
+.give .big { font-family: var(--display); font-size: 40px; line-height: 1; }
+.give p { color: #c9cdd6; font-size: 15px; }
+@media (max-width: 860px) { .give { grid-template-columns: minmax(0, 1fr); } .give > div + div { padding-left: 0; border-left: 0; border-top: 1px solid var(--line); } }
+.press { margin-top: 36px; color: var(--muted); font-size: 14px; max-width: 80ch; }
+.press b { color: var(--fg); font-weight: 500; }
+
+/* contact */
+.contact { margin-top: clamp(56px, 9vw, 110px); background: var(--bg-2); border-top: 1px solid var(--line); }
+.contact .inner { max-width: 1180px; margin: 0 auto; padding: clamp(56px, 8vw, 96px) var(--gutter) clamp(40px, 6vw, 64px); display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 40px; align-items: end; }
+.contact h2 { font-family: var(--display); font-weight: 400; font-size: clamp(40px, 6vw, 72px); line-height: 1; margin: 12px 0 18px; letter-spacing: -.02em; }
+.contact h2 em { color: var(--accent); }
+.contact p { color: var(--muted); max-width: 44ch; }
+.email { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 22px; }
+.email a { font-family: var(--mono); font-size: clamp(17px, 2.2vw, 22px); color: var(--fg); border-bottom: 1px solid var(--accent); padding-bottom: 2px; }
+.email a:hover { text-decoration: none; color: var(--accent); }
+.copy { font-family: var(--mono); font-size: 12px; color: var(--fg); background: transparent; border: 1px solid var(--line); border-radius: 4px; padding: 6px 12px; cursor: pointer; }
+.copy:hover { border-color: var(--faint); }
+.elsewhere { list-style: none; margin: 0; padding: 0; display: grid; border-top: 1px solid var(--line); }
+.elsewhere li a { display: grid; grid-template-columns: 90px minmax(0, 1fr) auto; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); color: var(--fg); align-items: baseline; }
+.elsewhere li a:hover { text-decoration: none; }
+.elsewhere li a:hover .v { color: var(--accent); }
+.elsewhere .k { font-family: var(--mono); font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
+.elsewhere .v { font-family: var(--mono); font-size: 14px; overflow-wrap: anywhere; }
+.elsewhere .arr { color: var(--faint); }
+.addr { font-size: 14px; color: var(--muted); margin-top: 18px; }
+@media (max-width: 860px) { .contact .inner { grid-template-columns: minmax(0, 1fr); } }
+footer { max-width: 1180px; margin: 0 auto; padding: 22px var(--gutter) calc(env(safe-area-inset-bottom, 0px) + 28px); font-family: var(--mono); font-size: 11.5px; color: var(--faint); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+</style>
+</head>
+<body>
+
+<nav class="nav" id="nav" aria-label="Sections">
+  <a class="mark" href="#top">Jake Kurlander</a>
+  <ul>
+    <li><a href="#research">Research</a></li>
+    <li><a href="#papers">Papers</a></li>
+    <li class="opt"><a href="#talks">Talks</a></li>
+    <li class="opt"><a href="#outreach">Outreach</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<main id="top">
+  <header class="hero">
+    <canvas id="hero-sky" aria-label="Animated view of the inner solar system showing every asteroid Rubin Observatory has discovered"></canvas>
+    <div class="hero-copy">
+      <div class="eyebrow">Astronomy PhD candidate · University of Washington · Rubin Observatory</div>
+      <h1>Jake<br><em>Kurlander</em></h1>
+      <p class="lede">I build the software that finds asteroids in Rubin Observatory's Legacy Survey of Space and Time. <b>Every point behind this text is a minor planet Rubin has discovered</b>, shown where it is in its orbit right now.</p>
+      <div class="caption">
+        <span class="k"><i style="background:var(--mb)"></i>main belt</span>
+        <span class="k"><i style="background:var(--neo)"></i>near-Earth &amp; Mars-crossing</span>
+        <span class="k"><i style="background:var(--res)"></i>Hildas &amp; Trojans</span>
+        <a href="/x05-orrery/">Explore all 34,540 in the interactive orrery →</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="block" id="about" aria-labelledby="about-h">
+    <div class="sec-head"><div class="eyebrow">About</div><h2 id="about-h">Measuring what a survey can and cannot see</h2></div>
+    <div class="about">
+      <div>
+        <div class="prose">
+          <p>I'm a PhD candidate in Astronomy at the University of Washington and the DiRAC Institute, advised by Mario Jurić. Since 2023 I have been a <strong>solar system pipeline developer for the Vera C. Rubin Observatory</strong>: I designed the pipeline that associates detections with known objects, and integrated the heliolinx linking algorithm into a new LSST discovery pipeline. The pipeline runs I'm responsible for have found more than 33,000 new asteroids.</p>
+          <p>My thesis, <em>Debiasing the LSST Solar System Catalogs</em>, asks the question that comes after discovery: given what the survey detected, what is actually out there? That means characterizing exactly which objects the survey could have found, and correcting for the ones it missed.</p>
+          <p>Before Rubin I worked at the Minor Planet Center at the Smithsonian Astrophysical Observatory, characterizing all-sky surveys and searching archival catalogs for distant objects. I studied math and computer science at Harvard.</p>
+        </div>
+        <dl class="facts">
+          <dt>Now</dt><dd>PhD candidate, UW Astronomy <span>· 2022 – 2027</span></dd>
+          <dt>Rubin</dt><dd>Solar System Pipeline Developer <span>· 2023 – present</span></dd>
+          <dt>Service</dt><dd>Inner Solar System Working Group Lead, LSST Solar System Science Collaboration <span>· elected 2026</span></dd>
+          <dt>Before</dt><dd>Minor Planet Center, SAO <span>· 2019 – 2022</span> · AB Math &amp; CS, Harvard <span>· 2022</span></dd>
+          <dt>Awards</dt><dd>LSST Data Science Fellowship Program, Cohort 6 · John Harvard Scholar</dd>
+        </dl>
+      </div>
+      <figure>
+        <img src="assets/portrait-sunset.jpg" alt="Jake Kurlander in a hi-vis vest in front of the Rubin Observatory dome at sunset" width="720" height="1280" loading="lazy">
+        <figcaption>Rubin Observatory, Cerro Pachón, Chile</figcaption>
+      </figure>
+    </div>
+    <div class="stats" aria-label="At a glance">
+      <div class="stat"><b id="statN">34,540</b><span>minor planets discovered by Rubin (MPC code X05) to date</span></div>
+      <div class="stat"><b>17</b><span>refereed papers and research notes</span></div>
+      <div class="stat"><b>9</b><span>undergraduate researchers advised</span></div>
+      <div class="stat"><b>30+</b><span>planetarium shows for the public</span></div>
+    </div>
+  </section>
+
+  <section class="block" id="research" aria-labelledby="research-h">
+    <div class="sec-head"><div class="eyebrow">Research</div><h2 id="research-h">Finding the solar system, then correcting for what we missed</h2></div>
+    <div class="projects">
+      <article class="project feature">
+        <div class="when"><span class="role">Pipeline lead</span>2023 – present</div>
+        <div class="feature-panel">
+          <div class="body">
+            <h3>Rubin's solar system pipelines</h3>
+            <p>Rubin is designed to find millions of new solar system objects. I lead development of the pipelines that do it: associating each night's detections with known objects, and linking the leftover detections into new orbits using heliolinx. By the end of the ten-year survey, most detections of known asteroids and most discoveries of new ones will have come through these pipelines.</p>
+            <p>Rubin's early data are already turning up science, from a super-fast rotating asteroid in Rubin's first alerts to observations of interstellar comet 3I/ATLAS.</p>
+            <div class="links"><a href="/x05-orrery/">Interactive orrery of X05 discoveries →</a><a href="https://doi.org/10.3847/2515-5172/ae67fe">Super-fast rotator (RNAAS 2026)</a><a href="https://doi.org/10.5194/epsc-dps2025-385">heliolinx poster</a></div>
+          </div>
+          <a class="orrery-card" href="/x05-orrery/" aria-label="Open the interactive orrery"><canvas id="mini" width="520" height="520"></canvas><span>Open the orrery →</span></a>
+        </div>
+      </article>
+      <article class="project">
+        <div class="when"><span class="role">Thesis</span>2022 – 2027</div>
+        <div class="body">
+          <h3>Debiasing the LSST solar system catalogs</h3>
+          <p>A discovery list tells you what a survey caught, not what exists. I inject simulated asteroids into Rubin's image processing to measure, object by object, whether a source of a given brightness and motion would have been detected, and use that to recover the true populations behind the catalogs.</p>
+          <div class="links"><a href="#talks">Early characterization of Rubin's discovery efficiency (ACM 2026)</a></div>
+        </div>
+      </article>
+      <article class="project">
+        <div class="when"><span class="role">First author</span>2025</div>
+        <div class="body">
+          <h3>Predicting what LSST will find</h3>
+          <p>How many near-Earth objects, main-belt asteroids, Jupiter Trojans and trans-Neptunian objects will LSST discover, and how well will it characterize them? I led the simulation of the full survey's solar system yield, part of a series of predictions covering Centaurs, Neptune Trojans and Hildas.</p>
+          <div class="links"><a href="https://doi.org/10.3847/1538-3881/add685">Kurlander et al. 2025, AJ</a><a href="https://doi.org/10.3847/1538-3881/ade435">Sorcha ephemerides</a><a href="https://doi.org/10.3847/1538-3881/add3ec">Sorcha simulator</a></div>
+        </div>
+      </article>
+      <article class="project">
+        <div class="when"><span class="role">First author</span>2019 – 2025</div>
+        <div class="body">
+          <h3>A well-characterized search for Centaurs</h3>
+          <p>At the Minor Planet Center I searched Pan-STARRS1 archival data for Centaurs with HelioLinC, and characterized the search completely enough to turn detections into population estimates. The work continued into a Pan-STARRS search for distant planets.</p>
+          <div class="links"><a href="https://doi.org/10.3847/1538-3881/ad9a58">Kurlander et al. 2025, AJ</a><a href="https://doi.org/10.3847/PSJ/addd03">Distant planets, PSJ 2025</a></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <figure class="band">
+    <img src="assets/dome-stairs.jpg" alt="A small figure on the steel stairway at the base of the Rubin Observatory dome" width="1800" height="1012" loading="lazy">
+    <figcaption>For scale: the Rubin dome, and me on its stairs.</figcaption>
+  </figure>
+
+  <section class="block" id="papers" aria-labelledby="papers-h">
+    <div class="sec-head"><div class="eyebrow">Publications</div><h2 id="papers-h">Papers</h2></div>
+    <div class="filter" role="group" aria-label="Filter papers">
+      <button type="button" id="fAll" aria-pressed="true">All 17</button>
+      <button type="button" id="fFirst" aria-pressed="false">First author</button>
+    </div>
+    <ol class="pubs" id="pubs">
+      <li class="first"><span class="yr">2026</span><div><div class="t">Characterizing a Super-fast Rotating Asteroid in Rubin Observatory First Alerts</div><div class="a"><b>Kurlander</b> et al.</div></div><a class="j" href="https://doi.org/10.3847/2515-5172/ae67fe">RNAAS ↗</a></li>
+      <li class="first"><span class="yr">2025</span><div><div class="t">Predictions of the LSST Solar System Yield: Near-Earth Objects, Main Belt Asteroids, Jupiter Trojans, and Trans-Neptunian Objects</div><div class="a"><b>Kurlander</b> et al.</div></div><a class="j" href="https://doi.org/10.3847/1538-3881/add685">AJ ↗</a></li>
+      <li class="first"><span class="yr">2025</span><div><div class="t">A Well-Characterized Survey for Centaurs in Pan-STARRS1</div><div class="a"><b>Kurlander</b> et al.</div></div><a class="j" href="https://doi.org/10.3847/1538-3881/ad9a58">AJ ↗</a></li>
+      <li><span class="yr">2026</span><div><div class="t">Rotational Light-curve Recovery and Predictions of the LSST Yield of Hildas</div><div class="a">Fleming et al.</div></div><a class="j" href="https://doi.org/10.3847/1538-3881/ae5e49">AJ ↗</a></li>
+      <li><span class="yr">2026</span><div><div class="t">The Vera C. Rubin Observatory Data Preview 1</div><div class="a">Vera C. Rubin Observatory</div></div><a class="j" href="https://doi.org/10.3847/1538-3881/ae521f">AJ ↗</a></li>
+      <li><span class="yr">2026</span><div><div class="t">NSF–DOE Vera C. Rubin Observatory Observations of Interstellar Comet 3I/ATLAS</div><div class="a">Chandler et al.</div></div><a class="j" href="https://doi.org/10.3847/2041-8213/ae4b3a">ApJL ↗</a></li>
+      <li><span class="yr">2026</span><div><div class="t">Lightcurves, Rotation Periods, and Colors for Vera C. Rubin Observatory's First Asteroid Discoveries</div><div class="a">Greenstreet et al.</div></div><a class="j" href="https://doi.org/10.3847/2041-8213/ae2a30">ApJL ↗</a></li>
+      <li><span class="yr">2026</span><div><div class="t">Predictions of the LSST Solar System Yield: Neptune Trojans</div><div class="a">Murtagh et al.</div></div><a class="j" href="https://doi.org/10.3847/1538-3881/ae27bd">AJ ↗</a></li>
+      <li><span class="yr">2026</span><div><div class="t">Assessing the Vera Rubin Observatory's Ability to Discover Asteroid Impactors before They Collide with Earth</div><div class="a">Cheng et al.</div></div><a class="j" href="https://doi.org/10.3847/1538-3881/ae5936">AJ ↗</a></li>
+      <li><span class="yr">2025</span><div><div class="t">A Pan-STARRS Search for Distant Planets: Part 1</div><div class="a">Holman et al.</div></div><a class="j" href="https://doi.org/10.3847/PSJ/addd03">PSJ ↗</a></li>
+      <li><span class="yr">2025</span><div><div class="t">Sorcha: A Solar System Survey Simulator for the Legacy Survey of Space and Time</div><div class="a">Merritt et al.</div></div><a class="j" href="https://doi.org/10.3847/1538-3881/add3ec">AJ ↗</a></li>
+      <li><span class="yr">2025</span><div><div class="t">Sorcha: Optimized Solar System Ephemeris Generation</div><div class="a">Holman et al.</div></div><a class="j" href="https://doi.org/10.3847/1538-3881/ade435">AJ ↗</a></li>
+      <li><span class="yr">2025</span><div><div class="t">Predictions of the LSST Solar System Yield: Discovery Rates and Characterizations of Centaurs</div><div class="a">Murtagh et al.</div></div><a class="j" href="https://doi.org/10.3847/1538-3881/ade1db">AJ ↗</a></li>
+      <li><span class="yr">2025</span><div><div class="t">Expected Impact of Rubin Observatory LSST on NEO Follow-up</div><div class="a">Wagg et al.</div></div><a class="j" href="https://doi.org/10.3847/1538-3881/adc89f">AJ ↗</a></li>
+      <li><span class="yr">2025</span><div><div class="t">A Link Between White Dwarf Pulsars and Polars: Multiwavelength Observations of the 9.36-minute Period Variable Gaia22ayj</div><div class="a">Rodriguez et al.</div></div><a class="j" href="https://doi.org/10.1088/1538-3873/adb0f1">PASP ↗</a></li>
+      <li><span class="yr">2025</span><div><div class="t">Recommendations for the Vera C. Rubin Observatory Early Science Schedule</div><div class="a">Schwamb et al.</div></div><a class="j" href="https://doi.org/10.3847/2515-5172/ae047b">RNAAS ↗</a></li>
+      <li><span class="yr">2025</span><div><div class="t">AI-enhanced Citizen Science Discovers Cometary Activity on Near-Earth Object (523822) 2012 DG61</div><div class="a">Chandler et al.</div></div><a class="j" href="https://doi.org/10.3847/2515-5172/ada368">RNAAS ↗</a></li>
+    </ol>
+    <p style="margin-top:14px;font-size:14px;color:var(--muted)">Full list on <a href="https://ui.adsabs.harvard.edu/search/q=author%3A%22Kurlander%2C%20J%22&amp;sort=date%20desc">NASA ADS</a> and <a href="https://orcid.org/0009-0005-5452-0671">ORCID</a>.</p>
+  </section>
+
+  <section class="block" id="talks" aria-labelledby="talks-h">
+    <div class="sec-head"><div class="eyebrow">Talks</div><h2 id="talks-h">Talks</h2></div>
+    <div class="talks">
+      <div>
+        <h3>Invited</h3>
+        <ul class="tl">
+          <li><span class="t">DP2 Solar System Processing and Results</span><span class="w">Rubin Community Workshop · 2026</span></li>
+          <li><span class="t">Debiasing the Solar System with LSST</span><span class="w">Duke University · 2025</span></li>
+          <li><span class="t">Study of Solar System Objects in DP0.3</span><span class="w">DP0 Rubin Data Academy · 2025</span></li>
+          <li><span class="t">A Well-characterized Survey for Centaurs in Pan-STARRS1</span><span class="w">University of Sydney · 2024</span></li>
+          <li><span class="t">DP0.3 Simulation Overview <span style="color:var(--muted)">(with P. Bernardinelli)</span></span><span class="w">Rubin Observatory DP0.3 Delegate Assembly · 2023</span></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Conferences</h3>
+        <ul class="tl">
+          <li><span class="t">Early Characterization of Rubin Observatory's Asteroid Discovery Efficiency</span><span class="w">ACM 2026 · Poznań, Poland</span></li>
+          <li><span class="t">Predictions of the LSST Solar System Yield</span><span class="w">EPSC–DPS 2025 · Helsinki, Finland</span></li>
+          <li><span class="t">A Well-Characterized HelioLinC Survey for Centaurs in Pan-STARRS1</span><span class="w">AAS 245 · National Harbor, MD · 2025</span></li>
+          <li><span class="t">Predictions of the LSST's Solar System Object Yield</span><span class="w">DPS 2024 · Boise, ID</span></li>
+          <li><span class="t">Predictions of the LSST TNO Yield</span><span class="w">TNO 2024 · Taipei, Taiwan</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="outreach" aria-labelledby="outreach-h">
+    <div class="sec-head"><div class="eyebrow">Mentoring &amp; outreach</div><h2 id="outreach-h">Beyond the pipeline</h2></div>
+    <div class="give">
+      <div><div class="big">9</div><h3>Undergraduate research</h3><p>I've been the sole advisor for nine UW undergraduates on their own research projects. Three won the DiRAC prize for summer research, and one published a first-author paper and went on to graduate school at the University of Victoria.</p></div>
+      <div><div class="big">Weekly</div><h3>eSTEAM tutoring</h3><p>I tutor students aged 7 to 25 at Echo Glen Juvenile Detention Center, and since 2025 I've been lead organizer, coordinating the weekly visits with the center's staff and teachers.</p></div>
+      <div><div class="big">30+</div><h3>UW Planetarium</h3><p>Hour-long introductions to the night sky for school groups, seniors' groups and the public.</p></div>
+    </div>
+    <p class="press"><b>In the press:</b> the LSST yield predictions were covered by UW News (republished by phys.org and ScienceDaily), GeekWire, EarthSky, Earth.com and The Daily Galaxy in June 2025.</p>
+  </section>
+
+  <section class="contact" id="contact" aria-labelledby="contact-h">
+    <div class="inner">
+      <div>
+        <div class="eyebrow">Contact</div>
+        <h2 id="contact-h">Say <em>hello</em>.</h2>
+        <p>I'm happy to talk about Rubin solar system data, survey debiasing, collaborations, or mentoring. Email is the best way to reach me.</p>
+        <div class="email"><a href="mailto:jkurla@uw.edu" id="emailLink">jkurla@uw.edu</a><button type="button" class="copy" id="copyBtn">Copy</button></div>
+        <p class="addr">DiRAC Institute · Department of Astronomy<br>University of Washington, Seattle</p>
+      </div>
+      <ul class="elsewhere">
+        <li><a href="https://github.com/gerenjie"><span class="k">GitHub</span><span class="v">gerenjie</span><span class="arr">↗</span></a></li>
+        <li><a href="https://orcid.org/0009-0005-5452-0671"><span class="k">ORCID</span><span class="v">0009-0005-5452-0671</span><span class="arr">↗</span></a></li>
+        <li><a href="https://ui.adsabs.harvard.edu/search/q=author%3A%22Kurlander%2C%20J%22&amp;sort=date%20desc"><span class="k">NASA ADS</span><span class="v">Kurlander, J.</span><span class="arr">↗</span></a></li>
+        <li><a href="/x05-orrery/"><span class="k">Orrery</span><span class="v">X05 discoveries</span><span class="arr">→</span></a></li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <span>© 2026 Jake Kurlander</span>
+  <span>Background: MPC X05 discoveries via the Small Body Explorer, two-body propagation</span>
+</footer>
+
+<script src="assets/x05-data.js" defer></script>
+<script src="assets/hero.js" defer></script>
+<script>
+  // nav border on scroll
+  const nav = document.getElementById('nav');
+  addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 40), { passive: true });
+
+  // copy email
+  document.getElementById('copyBtn').addEventListener('click', async (ev) => {
+    const b = ev.currentTarget;
+    try { await navigator.clipboard.writeText('jkurla@uw.edu'); b.textContent = 'Copied'; }
+    catch { const r = document.createRange(); r.selectNodeContents(document.getElementById('emailLink')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = 'Selected'; }
+    setTimeout(() => (b.textContent = 'Copy'), 1800);
+  });
+
+  // paper filter
+  const fAll = document.getElementById('fAll'), fFirst = document.getElementById('fFirst');
+  const setF = (first) => {
+    fAll.setAttribute('aria-pressed', String(!first)); fFirst.setAttribute('aria-pressed', String(first));
+    document.querySelectorAll('#pubs li').forEach((li) => (li.hidden = first && !li.classList.contains('first')));
+  };
+  fAll.addEventListener('click', () => setF(false)); fFirst.addEventListener('click', () => setF(true));
+
+  // static a-vs-i thumbnail for the orrery card, drawn once the data has loaded
+  addEventListener('load', async () => {
+    const cv = document.getElementById('mini'); if (!cv || !window.X05_B64 || !('DecompressionStream' in window)) return;
+    const bin = Uint8Array.from(atob(window.X05_B64), (c) => c.charCodeAt(0));
+    const raw = new Uint8Array(await new Response(new Blob([bin]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer());
+    const N = raw.length / 13, A = new Uint16Array(raw.buffer.slice(0, 2 * N)), E = new Uint16Array(raw.buffer.slice(2 * N, 4 * N));
+    const C = raw.subarray(10 * N, 11 * N), cols = ['#d95926', '#d95926', '#8c95a8', '#199e70', '#199e70', '#3987e5', '#199e70', '#3987e5'];
+    const c = cv.getContext('2d'), W = cv.width, H = cv.height;
+    c.fillStyle = '#0b0f17'; c.fillRect(0, 0, W, H); c.globalCompositeOperation = 'lighter';
+    for (let k = 0; k < N; k++) {
+      const a = Math.pow(10, A[k] / 65535 * 3.6 - 0.1), e = E[k] / 65535;
+      if (a < 1 || a > 5.6) continue;
+      c.fillStyle = cols[C[k]]; c.globalAlpha = C[k] === 2 ? 0.35 : 0.9;
+      const s = C[k] === 2 ? 1.2 : 2.4;
+      c.fillRect(24 + (a - 1) / 4.6 * (W - 48), H - 40 - e / 0.6 * (H - 80), s, s);
+    }
+    c.globalCompositeOperation = 'source-over'; c.globalAlpha = 1;
+    c.fillStyle = '#5f687b'; c.font = '20px IBM Plex Mono, monospace'; c.fillText('a vs e', 24, 40);
+  });
+</script>
+</body>
+</html>
