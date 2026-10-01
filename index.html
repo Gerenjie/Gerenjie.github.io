@@ -146,6 +146,8 @@ figcaption { font-family: var(--mono); font-size: 11.5px; color: var(--faint); }
 .give > div { padding: 24px 24px 24px 0; display: grid; gap: 10px; align-content: start; }
 .give > div + div { padding-left: 24px; border-left: 1px solid var(--line); }
 .give .big { font-family: var(--display); font-size: 40px; line-height: 1; }
+.give .big a { color: var(--fg); text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 6px; }
+.give .big a:hover { color: var(--accent); }
 .give p { color: #c9cdd6; font-size: 15px; }
 @media (max-width: 860px) { .give { grid-template-columns: minmax(0, 1fr); } .give > div + div { padding-left: 0; border-left: 0; border-top: 1px solid var(--line); } }
 .press { margin-top: 36px; color: var(--muted); font-size: 14px; max-width: 80ch; }
@@ -192,7 +194,7 @@ footer { max-width: 1180px; margin: 0 auto; padding: 22px var(--gutter) calc(env
     <div class="hero-copy">
       <div class="eyebrow">PhD candidate · University of Washington · Rubin Observatory</div>
       <h1>Jake<br><em>Kurlander</em></h1>
-      <p class="lede">I build the software that finds asteroids in Rubin Observatory's Legacy Survey of Space and Time.</p>
+      <p class="lede">I build software that finds asteroids in Rubin Observatory's Legacy Survey of Space and Time.</p>
       <div class="caption">
         <span class="date" id="heroDate" title="Date shown in the animation">2025-04-01</span>
         <span class="k"><i style="background:var(--mb)"></i>main belt</span>
@@ -228,7 +230,7 @@ footer { max-width: 1180px; margin: 0 auto; padding: 22px var(--gutter) calc(env
     <div class="stats" aria-label="At a glance">
       <div class="stat"><b id="statN">34,540</b><span>minor planets discovered by Rubin (MPC code X05) to date</span></div>
       <div class="stat"><b>17</b><span>refereed papers and research notes</span></div>
-      <div class="stat"><b>9</b><span>undergraduate researchers advised</span></div>
+      <div class="stat"><b>10</b><span>undergraduate researchers advised</span></div>
       <div class="stat"><b>30+</b><span>planetarium shows for the public</span></div>
     </div>
   </section>
@@ -258,7 +260,7 @@ footer { max-width: 1180px; margin: 0 auto; padding: 22px var(--gutter) calc(env
       <article class="project">
         <div class="when"><span class="role">First author</span>2025</div>
         <div class="body">
-          <h3>Predicting what LSST will find</h3>
+          <h3>Survey Simulation</h3>
           <p>How many near-Earth objects, main-belt asteroids, Jupiter Trojans and trans-Neptunian objects will LSST discover, and how well will it characterize them? I led the simulation of the full survey's solar system yield, part of a series of predictions covering Centaurs, Neptune Trojans and Hildas.</p>
           <div class="links"><a href="https://doi.org/10.3847/1538-3881/add685">Kurlander et al. 2025, AJ</a><a href="https://doi.org/10.3847/1538-3881/ade435">Sorcha ephemerides</a><a href="https://doi.org/10.3847/1538-3881/add3ec">Sorcha simulator</a></div>
         </div>
@@ -266,7 +268,7 @@ footer { max-width: 1180px; margin: 0 auto; padding: 22px var(--gutter) calc(env
       <article class="project">
         <div class="when"><span class="role">First author</span>2019 – 2025</div>
         <div class="body">
-          <h3>A well-characterized search for Centaurs</h3>
+          <h3>Well-characterized searches of the outer solar system</h3>
           <p>At the Minor Planet Center I searched Pan-STARRS1 archival data for Centaurs with HelioLinC, and characterized the search completely enough to turn detections into population estimates. The work continued into a Pan-STARRS search for distant planets.</p>
           <div class="links"><a href="https://doi.org/10.3847/1538-3881/ad9a58">Kurlander et al. 2025, AJ</a><a href="https://doi.org/10.3847/PSJ/addd03">Distant planets, PSJ 2025</a></div>
         </div>
@@ -311,8 +313,8 @@ footer { max-width: 1180px; margin: 0 auto; padding: 22px var(--gutter) calc(env
   <section class="block" id="outreach" aria-labelledby="outreach-h">
     <div class="sec-head"><div class="eyebrow">Mentoring &amp; outreach</div><h2 id="outreach-h">Beyond the pipeline</h2></div>
     <div class="give">
-      <div><div class="big">9</div><h3>Undergraduate research</h3><p>I've been the sole advisor for nine UW undergraduates on their own research projects. Three won the DiRAC prize for summer research, and one published a first-author paper and went on to graduate school at the University of Victoria.</p></div>
-      <div><div class="big">Weekly</div><h3>eSTEAM tutoring</h3><p>I tutor students aged 7 to 25 at Echo Glen Juvenile Detention Center, and since 2025 I've been lead organizer, coordinating the weekly visits with the center's staff and teachers.</p></div>
+      <div><div class="big">10</div><h3>Undergrad researchers</h3><p>I've been the sole advisor for ten UW undergraduates on their own research projects. Three won the DiRAC prize for summer research, and one published a first-author paper and went on to graduate school at the University of Victoria.</p></div>
+      <div><div class="big"><a href="https://www.e-steam.org/">eSTEAM tutoring</a></div><h3>Weekly</h3><p>I tutor students aged 7 to 25 at Echo Glen Juvenile Detention Center, and since 2025 I've been lead organizer, coordinating the weekly visits with the center's staff and teachers.</p></div>
       <div><div class="big">30+</div><h3>UW Planetarium</h3><p>Hour-long introductions to the night sky for school groups, seniors' groups and the public.</p></div>
     </div>
     <p class="press"><b>In the press:</b> the LSST yield predictions were covered by UW News (republished by phys.org and ScienceDaily), GeekWire, EarthSky, Earth.com and The Daily Galaxy in June 2025.</p>
